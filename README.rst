@@ -2,11 +2,10 @@ botosh
 ======
 
 A shell interface to Amazon Web Services based on the boto python interface
----------------------------------------------------------------------------
 
 ``botosh`` was created as a convenience tool for personal use. It is an
 interactive commadline interface written using the ``cmd`` module from the
-standard python library and uses the [boto]( https://github.com/boto/boto)
+standard python library and uses the boto_
 library to access AWS.
 
 
@@ -18,6 +17,8 @@ Installation
 
 A sample session
 ----------------
+
+::
 
     [steve@laptop src]$ python botosh/main.py
 
@@ -75,3 +76,4 @@ the actions I use most often. Feel free to contribute/suggest more commands.
 
 Hope you find it useful.
 
+.. _boto: https://github.com/boto/boto
