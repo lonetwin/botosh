@@ -41,13 +41,16 @@ class AWSAdmin(object, cmd.Cmd):
         return command
 
     def do_setup(self, ignored):
+        """ Configure credentials for AWS access """
         for key in ('AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'):
             os.environ[key] = raw_input("%s : " % key)
+        _context_cache.clear()
 
     def do_quit(self, ignored):
         sys.exit(0)
 
     def do_list_contexts(self, ignored):
+        """ List all available contexts """
         from botosh import available_contexts
         print "Available contexts:\n%s" % '\n'.join(available_contexts)
 

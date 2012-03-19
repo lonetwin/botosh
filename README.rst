@@ -11,8 +11,11 @@ library to access AWS.
 
 Installation
 ------------
-.. TODO
+
     * Install boto_ (obviously)
+    * ``git clone git://github.com/lonetwin/botosh.git``
+
+.. TODO
 
 
 A sample session
