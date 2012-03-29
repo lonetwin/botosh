@@ -17,11 +17,12 @@ class LBAdmin(AWSAdmin):
 
 
     def need_connect(func):
-        def is_connected(obj, args):
+        def is_connected(obj, *args):
             if not obj._lb:
                 print "Not connected to any load balancer. Please use the `connect` command"
             else:
-                return func(obj, args)
+                return func(obj, *args)
+        is_connected.__doc__ = func.__doc__
         return is_connected
 
 
@@ -29,7 +30,7 @@ class LBAdmin(AWSAdmin):
         """ List all available load balancers
         """
         for lb in self.elb_conn.get_all_load_balancers():
-            print str(lb).split(':')[1]
+            print lb.name
 
 
     def do_connect(self, lb_name):
@@ -40,10 +41,11 @@ class LBAdmin(AWSAdmin):
         if not lb_name:
             print "Please provide a load-balancer name to connect to. Execute `ls` to list all available load balancers"
         else:
-            lb = self.elb_conn.get_all_load_balancers( load_balancer_names=[ lb_name ] )
-            if lb:
-                self._lb = lb[0]
-                self.connected_to = lb_name
+            for lb in self.elb_conn.get_all_load_balancers():
+                if lb.name == lb_name:
+                    self._lb = lb
+                    self.connected_to = lb_name
+                    break
             else:
                 print "Could not connect to `%s`" % lb_name
 
