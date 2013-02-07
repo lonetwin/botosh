@@ -11,13 +11,44 @@ class S3Admin(AWSAdmin):
         self.bucket = None
 
     def __repr__(self):
-        return "s3 | %s" % str(self.bucket)
+        return "s3 | %s" % context(str(self.bucket or 'all buckets'))
 
-    def do_ls(self, ignored):
-        """ List all available buckets
+    def do_ls(self, bucket_or_pattern=''):
         """
-        for bucket in self.s3_conn.get_all_buckets():
-            print bucket.name
+        Without arguments:
+            - within the 'all buckets' context, list all available buckets
+            - within a bucket's context, list contents of bucket
+        With arguments:
+            - list all items matching the argument.
+              The argument can be either bucket-name or a pattern of the form:
+                [<bucket-name>/]prefix
+        """
+        if not bucket_or_pattern and not self.bucket:
+            for bucket in self.s3_conn.get_all_buckets():
+                print bucket.name
+        else:
+            bucket_name = prefix = ''
+            if self.bucket:
+                bucket_name = self.bucket
+
+            if bucket_or_pattern:
+                if '/' in bucket_or_pattern:
+                    bucket_name, prefix = bucket_or_pattern.split('/')
+                elif bucket_name == '':
+                    bucket_name = bucket_or_pattern
+                else:
+                    prefix = bucket_or_pattern
+
+                for bucket in self.s3_conn.get_all_buckets():
+                    if bucket_name == bucket.name:
+                        break
+                else:
+                    print error("No such bucket: %s" % info(bucket))
+
+            bucket = self.s3_conn.get_bucket(bucket_name)
+            for item in bucket.list(prefix=prefix):
+                print item.key
+
 
     def do_set_context(self, context=''):
         """ Set/Switch to a different context
@@ -30,7 +61,7 @@ class S3Admin(AWSAdmin):
         from botosh import available_contexts
         if context in available_contexts:
             self.instance_id = None
-            super(EC2Admin, self).do_set_context(context)
+            super(S3Admin, self).do_set_context(context)
         else:
             for bucket in self.s3_conn.get_all_buckets():
                 if context == bucket.name:
