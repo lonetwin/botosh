@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
-# - colors.py borrowed from fabric code
+# _wrap_with() and colors code borrowed from fabric's ( https://github.com/fabric/fabric ) colors.py
+# Copyright (c) 2009, Christian Vest Hansen and Jeffrey E. Forcier
+
 def _wrap_with(code):
 
     def inner(text, bold=False):

@@ -9,13 +9,12 @@ standard python library and uses the boto_
 library to access AWS.
 
 
-Installation
-------------
+Installation and Invocation
+---------------------------
 
     * Install boto_ (obviously)
     * ``git clone git://github.com/lonetwin/botosh.git``
-
-.. TODO
+    * ``$ cd botosh && python main.py``
 
 
 A sample session
@@ -23,16 +22,18 @@ A sample session
 
 ::
 
-    [steve@laptop src]$ python botosh/main.py
+    steve@lonelap ~/s/botosh (master) > python main.py
 
     Welcome to the AWS admin shell.
 
     - To execute any useful commands you must first
+
         * configure boto credentials using the `setup` command, if you haven't
           already got a boto config file (for example, under /etc/boto.cfg or /home/steve/.boto)
+
         * set a context using the `set_context` command.
 
-    - The currently available contexts are ['lb', 'ec2']
+    - The currently available contexts are ['s3', 'lb', 'ec2']
 
     - The available commands depend on the current context. Use the command `help`
       to list all available commands and `help <command>` to learn how to use a
@@ -40,38 +41,38 @@ A sample session
 
     - Don't Panic !
 
-     > help
-
-    Documented commands (type help <topic>):
-    ========================================
-    set_context
-
-    Undocumented commands:
-    ======================
-    exit  help  list_contexts  quit  setup
-
-     > list_contexts
+    context not set > list_contexts
     Available contexts:
+    s3
     lb
     ec2
-     > set_context ec2
-    ec2 > ls
+    context not set > set_context ec2
+    ec2 | all instances > ls
     Instance ID | Instance
-    =====================
-     i-01234567 | dbserver
-     i-f00dcafe | webserver
-    ec2 > set_context lb
+    ------------+--------------------------------
+    i-ca0cd5aa  | app instance0
+    i-0f29ce6a  | app instance1
+    i-e110028d  | database instance
+    ec2 | all instances > internal_ip i-e110028d
+    10.124.159.96
+    ec2 | all instances > set_context i-e110028d
+    ec2 | i-e110028d > internal_hostname
+    ip-10-124-159-96.ec2.internal
+    ec2 | i-e110028d > set_context lb
     lb | Not connected > ls
-    loadbalance-webserver
-    loadbalance-other
-    lb | Not connected > connect loadbalance-webserver
-    lb | loadbalance-webserver > status
+    app0-lb
+    app1-lb
+    lb | Not connected > connect app0-lb
+    lb | oi-lb > status
     Instance Id | Status
-    ====================
-     i-42424242 | InService
-    lb | loadbalance-webserver > add_instance i-01234567
-    lb | loadbalance-webserver > quit
+    ------------+----------
+    i-ca0cd5aa  | InService
+    i-0f29ce6a  | InService
+    lb | oi-lb > remove_instance i-ca0cd5aa
+    lb | oi-lb > add_instance i-ca0cd5aa
+    lb | oi-lb >
     Thanks for using the AWS admin shell !
+    steve@lonelap ~/s/botosh (master) >
 
 
 Currently botosh supports a *very* small subset of actions. However, these are
