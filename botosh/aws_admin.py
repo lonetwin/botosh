@@ -4,26 +4,29 @@ import sys
 import cmd
 import boto
 
+from utils import info, error, prompt
+from utils import green
+
 _context_cache = {}
 
 class AWSAdmin(object, cmd.Cmd):
 
     def __init__(self):
         cmd.Cmd.__init__(self)
-        self.context = ''
+        self.context = None
 
     @property
     def prompt(self):
-        return '%s > ' % self.context
+        return prompt('%s > ' % (self.context or error('context not set')))
 
     def do_set_context(self, context=''):
         """ Set/Switch to a different context """
         from botosh import available_contexts
 
         if not os.environ.get('AWS_ACCESS_KEY_ID', boto.config.get('Credentials', 'AWS_ACCESS_KEY_ID')):
-            print "boto has not been configured with sufficient credentials. Please using the `setup` command"
+            print error("boto has not been configured with sufficient credentials. Please use the `setup` command")
         if not context:
-            print 'No context provided. Please set context to one of %s' % available_contexts.keys()
+            print error('No context provided. Please `set_context` to one of: %s' % green(', '.join(available_contexts.keys())))
         elif context in available_contexts:
             if context not in _context_cache:
                 new_context = available_contexts[context]()
@@ -31,7 +34,7 @@ class AWSAdmin(object, cmd.Cmd):
                 new_context.context = new_context
             _context_cache[context].cmdloop()
         else:
-            print 'Invalid context'
+            print error('Invalid context')
 
     def precmd(self, command):
         if not self.context and \
@@ -52,6 +55,6 @@ class AWSAdmin(object, cmd.Cmd):
     def do_list_contexts(self, ignored):
         """ List all available contexts """
         from botosh import available_contexts
-        print "Available contexts:\n%s" % '\n'.join(available_contexts)
+        print "Available contexts:\n%s" % green('\n'.join(available_contexts.keys()))
 
     do_exit = do_quit

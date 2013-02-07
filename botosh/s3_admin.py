@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import boto
 from aws_admin import AWSAdmin
+from utils import info, error, context
 
 class S3Admin(AWSAdmin):
 

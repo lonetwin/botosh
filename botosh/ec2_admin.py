@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import boto
 from aws_admin import AWSAdmin
+from utils import error, context
+from utils import print_table
 
 class EC2Admin(AWSAdmin):
 
@@ -10,7 +12,7 @@ class EC2Admin(AWSAdmin):
         self.instance_id = None
 
     def __repr__(self):
-        return "ec2 | %s" % str(self.instance_id)
+        return "ec2 | %s" % context(str(self.instance_id or 'all instances'))
 
     def _for_all_instances(self):
         for reservation in self.ec2_conn.get_all_instances():
@@ -20,10 +22,10 @@ class EC2Admin(AWSAdmin):
     def do_ls(self, ignored):
         """ List all available instances
         """
-        print "Instance ID | Instance"
-        print "====================="
+        data = [('Instance ID', 'Instance')]
         for instance in self._for_all_instances():
-            print "%11s | %s" % (instance.id, instance.tags.get('Name', ''))
+            data.append((instance.id, instance.tags.get('Name', '')))
+        print_table(data)
 
 
     def do_set_context(self, context=''):
@@ -31,7 +33,7 @@ class EC2Admin(AWSAdmin):
 
         Besides the other available contexts (ie: those listed when you run
         `list_contexts`), you may provide an instance id. If you provide an
-        instance id any subsequent commands which expect an instance id
+        instance id any subsequent commands which expects an instance id
         would operate on this instance (unless an argument is explicitly
         provided).
         """
@@ -59,15 +61,15 @@ class EC2Admin(AWSAdmin):
         instances = list(self._for_all_instances())
         instance_ids = [ instance.id for instance in instances ]
         if instance_id and (instance_id not in instance_ids):
-            print "Invalid id: %s" % instance_id
+            error("Invalid id: %s" % instance_id)
         elif instance_id:
             instance = instances[ instance_ids.index(instance_id) ]
             print getattr(instance, attr)
         else:
-            print "Instance ID | %s" % attr
-            print "======================="
+            data = [('Instance ID', attr)]
             for instance_id, instance in zip(instance_ids, instances):
-                print "%11s | %s" % (instance_id, getattr(instance, attr))
+                data.append((instance_id, getattr(instance, attr)))
+            print_table(data)
 
 
     attr_doc = """ Print %(attr)s
@@ -94,4 +96,3 @@ class EC2Admin(AWSAdmin):
 
     do_status = lambda obj, instance_id: obj.get_attr(instance_id, 'state')
     do_status.__doc__ = attr_doc % {'attr' : 'status'}
-

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import boto
 from aws_admin import AWSAdmin
+from utils import info, error, context
+from utils import print_table
 
 class LBAdmin(AWSAdmin):
 
@@ -13,13 +15,13 @@ class LBAdmin(AWSAdmin):
 
 
     def __repr__(self):
-        return "lb | %s" % self.connected_to
+        return "lb | %s" % context(self.connected_to)
 
 
     def need_connect(func):
         def is_connected(obj, *args):
             if not obj._lb:
-                print "Not connected to any load balancer. Please use the `connect` command"
+                print error("Not connected to any load balancer. Please use the `connect` command")
             else:
                 return func(obj, *args)
         is_connected.__doc__ = func.__doc__
@@ -30,7 +32,7 @@ class LBAdmin(AWSAdmin):
         """ List all available load balancers
         """
         for lb in self.elb_conn.get_all_load_balancers():
-            print lb.name
+            print info(lb.name)
 
 
     def do_connect(self, lb_name):
@@ -39,7 +41,8 @@ class LBAdmin(AWSAdmin):
         Execute `ls` to list all available load balancers.
         """
         if not lb_name:
-            print "Please provide a load-balancer name to connect to. Execute `ls` to list all available load balancers"
+            print error("Please provide a load-balancer name to connect to. "
+                        "Execute `ls` to list all available load balancers")
         else:
             for lb in self.elb_conn.get_all_load_balancers():
                 if lb.name == lb_name:
@@ -47,17 +50,17 @@ class LBAdmin(AWSAdmin):
                     self.connected_to = lb_name
                     break
             else:
-                print "Could not connect to `%s`" % lb_name
+                print error("Could not connect to `%s`" % info(lb_name))
 
 
     @need_connect
     def do_status(self, lb_name):
         """ Shows the status of all the instances in the load balancer
         """
-        print "Instance Id | Status"
-        print "===================="
+        data = [("Instance Id", "Status")]
         for instance_state in self.elb_conn.describe_instance_health(self.connected_to):
-            print "%11s | %s" % (instance_state.instance_id, instance_state.state)
+            data.append((instance_state.instance_id, instance_state.state))
+        print_table(data)
 
 
     @need_connect
@@ -78,4 +81,3 @@ class LBAdmin(AWSAdmin):
         instance ids by switching context to `ec2` and executing `ls`
         """
         self._lb.deregister_instances( [instance_id] )
-
