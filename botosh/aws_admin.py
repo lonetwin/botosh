@@ -37,8 +37,9 @@ class AWSAdmin(object, cmd.Cmd):
             print error('Invalid context')
 
     def precmd(self, command):
-        if not self.context and \
-           not command.startswith('set_context') and \
+        if self.context or command.startswith('list_contexts'):
+            return command
+        elif not command.startswith('set_context') and \
            not command.startswith('setup'):
             return 'set_context'
         return command
