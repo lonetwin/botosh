@@ -22,7 +22,7 @@ class EC2Admin(AWSAdmin):
     def do_ls(self, ignored):
         """ List all available instances
         """
-        data = [('Instance ID', 'Instance')]
+        data = [('Instance ID', 'Instance Name')]
         for instance in self._for_all_instances():
             data.append((instance.id, instance.tags.get('Name', '')))
         print_table(data)

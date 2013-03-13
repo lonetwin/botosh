@@ -11,11 +11,11 @@ class LBAdmin(AWSAdmin):
     def __init__(self):
         AWSAdmin.__init__(self)
         self.elb_conn = boto.connect_elb()
-        self.connected_to = 'Not connected'
+        self.connected_to = ''
 
 
     def __repr__(self):
-        return "lb | %s" % context(self.connected_to)
+        return "lb | %s" % context(self.connected_to or 'Not connected')
 
 
     def need_connect(func):
@@ -28,11 +28,14 @@ class LBAdmin(AWSAdmin):
         return is_connected
 
 
-    def do_ls(self, ignored):
+    def do_ls(self, lb_name):
         """ List all available load balancers
         """
-        for lb in self.elb_conn.get_all_load_balancers():
-            print info(lb.name)
+        if not lb_name and not self._lb:
+            for lb in self.elb_conn.get_all_load_balancers():
+                print info(lb.name)
+        else:
+            self.do_status(lb_name)
 
 
     def do_connect(self, lb_name):
@@ -53,13 +56,26 @@ class LBAdmin(AWSAdmin):
                 print error("Could not connect to `%s`" % info(lb_name))
 
 
-    @need_connect
+    def do_disconnect(self, ignored):
+        """ Disconnect from the currently connected-to load balancer.
+        """
+        if self.connected_to:
+            self._lb = None
+            self.connected_to = ''
+
+
     def do_status(self, lb_name):
         """ Shows the status of all the instances in the load balancer
         """
-        data = [("Instance Id", "Status")]
-        for instance_state in self.elb_conn.describe_instance_health(self.connected_to):
-            data.append((instance_state.instance_id, instance_state.state))
+        # XXX needed to get instance name
+        ec2_conn = boto.connect_ec2()
+        lb_name = lb_name if lb_name else self.connected_to
+
+        data = [("Instance Name", "Instance Id", "Status")]
+        for instance_state in self.elb_conn.describe_instance_health(lb_name):
+            for reservation in ec2_conn.get_all_instances([instance_state.instance_id]):
+                for instance in reservation.instances:
+                    data.append((instance.tags.get('Name', ''), instance_state.instance_id, instance_state.state))
         print_table(data)
 
 
