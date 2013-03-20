@@ -67,8 +67,16 @@ class LBAdmin(AWSAdmin):
     def do_status(self, lb_name):
         """ Shows the status of all the instances in the load balancer
         """
-        # XXX needed to get instance name
-        ec2_conn = boto.connect_ec2()
+        # XXX get the ec2 context for the cache, if it exits. This is needed to
+        # get the instance names.
+        from botosh.aws_admin import _context_cache
+        from botosh import available_contexts
+        if 'ec2' not in _context_cache:
+            ec2_context = available_contexts['ec2']()
+        else:
+            ec2_context = _context_cache['ec2']
+
+        ec2_conn = ec2_context.ec2_conn
         lb_name = lb_name if lb_name else self.connected_to
 
         data = [("Instance Name", "Instance Id", "Status")]
