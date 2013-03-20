@@ -63,14 +63,14 @@ A sample session
     app0-lb
     app1-lb
     lb | Not connected > connect app0-lb
-    lb | oi-lb > status
+    lb | app0-lb > status
     Instance Id | Status
     ------------+----------
     i-ca0cd5aa  | InService
     i-0f29ce6a  | InService
-    lb | oi-lb > remove_instance i-ca0cd5aa
-    lb | oi-lb > add_instance i-ca0cd5aa
-    lb | oi-lb >
+    lb | app0-lb > remove_instance i-ca0cd5aa
+    lb | app0-lb > add_instance i-ca0cd5aa
+    lb | app0-lb >
     Thanks for using the AWS admin shell !
     steve@lonelap ~/s/botosh (master) >
 
