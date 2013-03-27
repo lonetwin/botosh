@@ -33,7 +33,7 @@ def print_table(rows):
     """
 
     # - figure out column widths
-    widths = [ len(max(columns, key=lambda item: len(item))) for columns in zip(*rows) ]
+    widths = [ len(max(columns, key=len)) for columns in zip(*rows) ]
 
     # - print the header
     header, data = rows[0], rows[1:]
