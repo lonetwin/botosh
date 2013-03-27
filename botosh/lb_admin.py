@@ -37,6 +37,19 @@ class LBAdmin(AWSAdmin):
         else:
             self.do_status(lb_name)
 
+    def do_set_context(self, context=''):
+        """ Set/Switch to a different context
+
+        Besides the other available contexts (ie: those listed when you run
+        `list_contexts`), you may provide an load balancer name . If you
+        provide this you will be `connected` to the load balancer.
+        """
+        from botosh import available_contexts
+        if context in available_contexts:
+            self.instance_id = None
+            super(LBAdmin, self).do_set_context(context)
+        else:
+            self.do_connect(context)
 
     def do_connect(self, lb_name):
         """ Connect to a load balancer.
