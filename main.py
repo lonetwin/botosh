@@ -17,8 +17,9 @@ Welcome to the AWS admin shell.
 
 - To execute any useful commands you must first
 
-    * configure boto credentials using the `setup` command, if you haven't
-      already got a boto config file (for example, under %s)
+    * configure boto credentials (for example, under %s or by setting the
+      AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables to
+      sutiable values)
 
     * set a context using the `set_context` command.
 

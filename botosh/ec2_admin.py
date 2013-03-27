@@ -45,6 +45,9 @@ class EC2Admin(AWSAdmin):
             for instance in self._for_all_instances():
                 if context == instance.id:
                     self.instance_id = instance.id
+                    break
+            else:
+                print error("Invalid instance id `%s`" % context)
 
 
     def check_context(func):
