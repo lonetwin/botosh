@@ -87,8 +87,15 @@ TODO:
 
     * Add more actions
     * Add tests ( explore moto_ )
+    * Package it for pypi (?)
     * Explore whether this can be refactored to be generic enough for other
       cloud platforms
+
+
+FEEDBACK:
+---------
+    Please report bugs at https://github.com/lonetwin/botosh/issues or mail me
+    as botosh at lonetwin.net
 
 .. _boto: https://github.com/boto/boto
 .. _configuration file: http://boto.readthedocs.org/en/latest/boto_config_tut.html
