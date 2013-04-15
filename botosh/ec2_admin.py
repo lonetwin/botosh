@@ -1,23 +1,31 @@
 #!/usr/bin/python
 import boto
 from aws_admin import AWSAdmin
-from utils import error, context
+from utils import error, prompt, data
 from utils import print_table
 
 class EC2Admin(AWSAdmin):
 
     def __init__(self):
         AWSAdmin.__init__(self)
-        self.ec2_conn = boto.connect_ec2()
+        self.conn = boto.connect_ec2()
         self.instance_id = None
+        self.region_switcher = boto.ec2.connect_to_region
 
     def __repr__(self):
-        return "ec2 | %s" % context(str(self.instance_id or 'all instances'))
+        return "ec2 | %s | %s" % (prompt(self.region),
+                                  data(self.instance_id or 'all instances')
+                                  )
+
+    @property
+    def _valid_regions(self):
+        return sorted(( region.name for region in boto.ec2.regions() ))
 
     def _for_all_instances(self):
-        for reservation in self.ec2_conn.get_all_instances():
+        for reservation in self.conn.get_all_instances():
             for instance in reservation.instances:
                 yield instance
+
 
     def do_ls(self, ignored):
         """ List all available instances

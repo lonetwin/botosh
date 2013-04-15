@@ -1,17 +1,22 @@
 #!/usr/bin/python
 import boto
 from aws_admin import AWSAdmin
-from utils import info, error, context
+from utils import info, error, prompt, data
 
 class S3Admin(AWSAdmin):
 
     def __init__(self):
         AWSAdmin.__init__(self)
-        self.s3_conn = boto.connect_s3()
+        self.conn = boto.connect_s3()
         self.bucket = None
 
     def __repr__(self):
-        return "s3 | %s" % context(str(self.bucket or 'all buckets'))
+        return "s3 | %s | %s" % (prompt(self.region),
+                                 data(self.bucket or 'all instances')
+                                 )
+
+    def do_switch_region(self, ignored):
+        print error("switching regions is not supported for s3")
 
     def do_ls(self, bucket_or_pattern=''):
         """
@@ -24,7 +29,7 @@ class S3Admin(AWSAdmin):
                 [<bucket-name>/]prefix
         """
         if not bucket_or_pattern and not self.bucket:
-            for bucket in self.s3_conn.get_all_buckets():
+            for bucket in self.conn.get_all_buckets():
                 print bucket.name
         else:
             bucket_name = prefix = ''
@@ -39,13 +44,13 @@ class S3Admin(AWSAdmin):
                 else:
                     prefix = bucket_or_pattern
 
-                for bucket in self.s3_conn.get_all_buckets():
+                for bucket in self.conn.get_all_buckets():
                     if bucket_name == bucket.name:
                         break
                 else:
                     print error("No such bucket: %s" % info(bucket))
 
-            bucket = self.s3_conn.get_bucket(bucket_name)
+            bucket = self.conn.get_bucket(bucket_name)
             for item in bucket.list(prefix=prefix):
                 print item.key
 
@@ -63,7 +68,7 @@ class S3Admin(AWSAdmin):
             self.instance_id = None
             super(S3Admin, self).do_set_context(context)
         else:
-            for bucket in self.s3_conn.get_all_buckets():
+            for bucket in self.conn.get_all_buckets():
                 if context == bucket.name:
                     self.bucket = bucket.name
 

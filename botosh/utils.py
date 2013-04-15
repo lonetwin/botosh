@@ -23,7 +23,7 @@ white = _wrap_with('37')
 error   = red
 info    = green
 prompt  = cyan
-context = magenta
+data    = magenta
 
 def print_table(rows):
     """print_table(rows)

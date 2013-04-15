@@ -13,6 +13,7 @@ Installation and Invocation
 ---------------------------
 
     * Install boto_ (obviously)
+    * Create a boto `configuration file`_
     * ``git clone git://github.com/lonetwin/botosh.git``
     * ``$ cd botosh && python main.py``
 
@@ -28,8 +29,9 @@ A sample session
 
     - To execute any useful commands you must first
 
-        * configure boto credentials using the `setup` command, if you haven't
-          already got a boto config file (for example, under /etc/boto.cfg or /home/steve/.boto)
+        * configure boto credentials (for example, under /etc/boto.cfg or /home/steve/.boto or by setting the
+          AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables to
+          sutiable values)
 
         * set a context using the `set_context` command.
 
@@ -80,4 +82,14 @@ the actions I use most often. Feel free to contribute/suggest more commands.
 
 Hope you find it useful.
 
+TODO:
+-----
+
+    * Add more actions
+    * Add tests ( explore moto_ )
+    * Explore whether this can be refactored to be generic enough for other
+      cloud platforms
+
 .. _boto: https://github.com/boto/boto
+.. _configuration file: http://boto.readthedocs.org/en/latest/boto_config_tut.html
+.. _moto: https://github.com/spulec/moto/
